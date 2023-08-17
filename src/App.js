@@ -19,6 +19,10 @@ function App() {
     );
   }
 
+  function handleClear() {
+    setItems([]);
+  }
+
   // return app
   return (
     <div className="App">
@@ -28,8 +32,9 @@ function App() {
         items={items}
         onDeleteItem={handleDeleteItem}
         onToggleItems={handleToggleItem}
+        handleClear={handleClear}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -83,7 +88,7 @@ const Form = ({ onAddItems }) => {
   );
 };
 // Packing Component--------------------
-const PackingList = ({ items, onDeleteItem, onToggleItems }) => {
+const PackingList = ({ items, onDeleteItem, onToggleItems, handleClear }) => {
   return (
     <div className="list">
       <ul>
@@ -96,6 +101,7 @@ const PackingList = ({ items, onDeleteItem, onToggleItems }) => {
           />
         ))}
       </ul>
+      <button onClick={handleClear}>Clear List</button>
     </div>
   );
 };
@@ -117,11 +123,32 @@ const Item = ({ item, onDeleteItem, onToggleItems }) => {
 };
 
 // stat component--------------------
-const Stats = () => {
+const Stats = ({ items }) => {
+  if (!items.length)
+    return (
+      <p className="stats">
+        <em>Start adding items to your lists</em>
+      </p>
+    );
+
+  if (items.length >= 20) {
+    return (
+      <p className="stats">
+        <em>Baggage is full, can't add other items</em>
+      </p>
+    );
+  }
+  const countItems = items.length;
+  const numPacked = items.filter((item) => item.packed).length;
+  const percentage = Math.floor((numPacked / countItems) * 100);
+
   return (
     <footer className="stats">
       <em>
-        You have X items on your list, and you have already packed x items
+        {percentage === 100
+          ? "You have packed everything ! Ready to travel"
+          : `You have ${countItems} items on your list, and you have already packed
+        ${numPacked}(${percentage}%)`}
       </em>
     </footer>
   );
